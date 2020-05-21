@@ -5,9 +5,9 @@ module.exports = function(bot) {
 		/**
 		 * Get extract 
 		 * @param {string} pagetext - full page text 
-		 * @param {number} charLimit - cut off the extract at this many readable characters, or wherever 
+		 * @param {number} [charLimit] - cut off the extract at this many readable characters, or wherever 
 		 * the sentence ends after this limit
-		 * @param {number} hardUpperLimit - cut off the extract at this many readable characters even if 
+		 * @param {number} [hardUpperLimit] - cut off the extract at this many readable characters even if 
 		 * the sentence hasn't ended
 		 */
 		static getExtract(pagetext, charLimit, hardUpperLimit) {
@@ -49,28 +49,32 @@ module.exports = function(bot) {
 				.replace(/\(\{\{[Ll]ang-.*?\}\}\)/, '')
 				.trim();
 	
-			// We consider a period followed by a space or newline NOT followed by a lowercase char
-			// as a sentence ending. Lowercase chars after period+space is generally use of an abbreviation
-			// XXX: this still results in issues with name like Arthur A. Kempod.
-			//  (?![^[]*?\]\]) so that this is not a period within a link
-			//  (?![^{*]?\}\}) so that this is not a period within a template - doesn't work if there 
-			//      is a nested templates after the period.
-			var sentenceEnd = /\.\s(?![a-z])(?![^[]*?\]\])(?![^{]*?\}\})/g;
-	
-			if (extract.length > charLimit) {
-				match = sentenceEnd.exec(extract);
-				while (match) {
-					if (TextExtractor.effCharCount(extract.slice(0, match.index)) > charLimit) {
-						extract = extract.slice(0, match.index + 1);
-						break;
-					} else {
-						match = sentenceEnd.exec(extract);
+			if (charLimit) {
+				// We consider a period followed by a space or newline NOT followed by a lowercase char
+				// as a sentence ending. Lowercase chars after period+space is generally use of an abbreviation
+				// XXX: this still results in issues with name like Arthur A. Kempod.
+				//  (?![^[]*?\]\]) so that this is not a period within a link
+				//  (?![^{*]?\}\}) so that this is not a period within a template - doesn't work if there 
+				//      is a nested templates after the period.
+				var sentenceEnd = /\.\s(?![a-z])(?![^[]*?\]\])(?![^{]*?\}\})/g;
+		
+				if (extract.length > charLimit) {
+					match = sentenceEnd.exec(extract);
+					while (match) {
+						if (TextExtractor.effCharCount(extract.slice(0, match.index)) > charLimit) {
+							extract = extract.slice(0, match.index + 1);
+							break;
+						} else {
+							match = sentenceEnd.exec(extract);
+						}
 					}
 				}
 			}
 	
-			if (TextExtractor.effCharCount(extract) > hardUpperLimit) {
-				extract = extract.slice(0, hardUpperLimit) + ' ...';
+			if (hardUpperLimit) {
+				if (TextExtractor.effCharCount(extract) > hardUpperLimit) {
+					extract = extract.slice(0, hardUpperLimit) + ' ...';
+				}
 			}
 	
 			return extract;
