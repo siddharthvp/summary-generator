@@ -14,26 +14,13 @@ module.exports = function(bot) {
 	
 			// Remove images. Can't be done correctly with just regex as there could be wikilinks 
 			// in the captions.
-			var wkt = new bot.wikitext(pagetext);
-			wkt.parseLinks();
-			wkt.files.forEach(file => {
-				wkt.removeEntity(file);
-			});
-			var extract = wkt.getText();
+			var extract = TextExtractor.removeImages(pagetext);
 	
 			// Remove templates beginning on a new line, such as infoboxes.	
 			// These ocassionally contain parameters with part of the content 
 			// beginning on a newline not starting with a | or * or # or !
 			// thus can't be handled with the line regex.
-			var templateOnNewline = /^\{\{/mg;
-			var match;
-			// eslint-disable-next-line no-cond-assign
-			while (match = templateOnNewline.exec(pagetext)) {	
-				var template = new bot.wikitext(extract.slice(match.index)).parseTemplates(1)[0];
-				if (template) {
-					extract = extract.replace(template.wikitext, '');
-				}
-			}
+			extract = TextExtractor.removeTemplatesOnNewlines(extract);
 	
 			extract = extract
 				.replace(/<!--.*?-->/sg, '')
@@ -59,7 +46,7 @@ module.exports = function(bot) {
 				var sentenceEnd = /\.\s(?![a-z])(?![^[]*?\]\])(?![^{]*?\}\})/g;
 		
 				if (extract.length > charLimit) {
-					match = sentenceEnd.exec(extract);
+					var match = sentenceEnd.exec(extract);
 					while (match) {
 						if (TextExtractor.effCharCount(extract.slice(0, match.index)) > charLimit) {
 							extract = extract.slice(0, match.index + 1);
@@ -78,6 +65,28 @@ module.exports = function(bot) {
 			}
 	
 			return extract;
+		}
+
+		static removeImages(text) {
+			var wkt = new bot.wikitext(text);
+			wkt.parseLinks();
+			wkt.files.forEach(file => {
+				wkt.removeEntity(file);
+			});
+			return wkt.getText();
+		}
+
+		static removeTemplatesOnNewlines(text) {
+			var templateOnNewline = /^\{\{/m; // g is omitted for a reason, the text is changing.
+			var match = templateOnNewline.exec(text);
+			while (match) {	
+				var template = new bot.wikitext(text.slice(match.index)).parseTemplates(1)[0];
+				if (template) {
+					text = text.replace(template.wikitext, '');
+				}
+				match = templateOnNewline.exec(text);
+			}
+			return text;
 		}
 	
 		static effCharCount(text) {

@@ -5,7 +5,7 @@
   "main": "summary-generator.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node server.js",
+    "start": "node www/js/server.js",
     "deploy": "webservice --backend kubernetes node10 restart"
   },
   "repository": {
