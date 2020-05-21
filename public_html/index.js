@@ -4,7 +4,7 @@ $('#submit').click(function(e) {
 	e.preventDefault();
 	var article_name = $('#article').val();
 	$('#loading').show();
-	$.get('http://localhost:3000/api', {
+	$.get('https://summary-generator.toolforge.org', {
 			article: article_name
 		}
 	).then(function(response) {

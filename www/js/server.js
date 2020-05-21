@@ -26,10 +26,10 @@ var handleRequest = (req, res) => {
 
 bot.getSiteInfo().then(() => {
 
-	app.get('/api', (req, res) => {
+	app.get('/', (req, res) => {
 		handleRequest(req, res);
 	});
-	app.post('/api', (req, res) => {
+	app.post('/', (req, res) => {
 		handleRequest(req, res);
 	});
 	

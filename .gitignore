@@ -1,5 +1,9 @@
+
+# node
 node_modules/
 npm-debug.log*
+
+# toolforge
 replica.my.cnf
 *.out
 *.err
@@ -7,3 +11,6 @@ replica.my.cnf
 logs/
 service.manifest
 core
+.bash*
+.kube/
+.toolskube/
