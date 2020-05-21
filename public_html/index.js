@@ -4,13 +4,14 @@ $('#submit').click(function(e) {
 	e.preventDefault();
 	var article_name = $('#article').val();
 	$('#loading').show();
-	$.get('https://summary-generator.toolforge.org', {
+	// $.get('http://localhost:3000', {
+	$.get('https://summary-generator.toolforge.org/summary', {
 			article: article_name
 		}
 	).then(function(response) {
 		$('#extract').text(response);
 		return $.post('https://en.wikipedia.org/api/rest_v1/transform/wikitext/to/html', {
-			wikitext: response, 
+			wikitext: response,
 			title: article_name,
 			body_only: true
 		});

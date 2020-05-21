@@ -12,5 +12,6 @@ logs/
 service.manifest
 core
 .bash*
+.profile
 .kube/
 .toolskube/

@@ -6,7 +6,8 @@ const app = express();
 app.use(express.json());
 app.use(cors());
 
-const port = parseInt(process.env.PORT, 10);
+// const port = parseInt(process.env.PORT, 10);
+const port = 443;
 
 const bot = new mwn({ apiUrl: 'https://en.wikipedia.org/w/api.php' });
 
@@ -26,10 +27,14 @@ var handleRequest = (req, res) => {
 
 bot.getSiteInfo().then(() => {
 
-	app.get('/api', (req, res) => {
+	app.get('/index.html', (req, res) => {
+		res.sendFile(__dirname + '/index.html');
+	});
+
+	app.get('/summary', (req, res) => {
 		handleRequest(req, res);
 	});
-	app.post('/api', (req, res) => {
+	app.post('/summary', (req, res) => {
 		handleRequest(req, res);
 	});
 
