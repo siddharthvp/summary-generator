@@ -1,2 +1,9 @@
 node_modules/
 npm-debug.log*
+replica.my.cnf
+*.out
+*.err
+*.log
+logs/
+service.manifest
+core

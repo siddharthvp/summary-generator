@@ -6,11 +6,11 @@ const app = express();
 app.use(express.json());
 app.use(cors());
 
-const port = 3000;
+const port = parseInt(process.env.PORT, 10);
 
 const bot = new mwn({ apiUrl: 'https://en.wikipedia.org/w/api.php' });
 
-const TextExtractor = require('./TextExtractor')(bot);
+const TextExtractor = require('../../TextExtractor')(bot);
 
 var handleRequest = (req, res) => {
 	var params = Object.assign({}, req.query, req.body);
