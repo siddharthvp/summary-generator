@@ -1,12 +1,14 @@
 /* globals $ */
-
+console.log('howdy');
 $('#submit').click(function(e) {
 	e.preventDefault();
 	var article_name = $('#article').val();
 	$('#loading').show();
-	// $.get('http://localhost:3000', {
+
 	$.get('https://summary-generator.toolforge.org/summary', {
-			article: article_name
+			article: article_name,
+			charLimit: 250,
+			hardUpperLimit: 500
 		}
 	).then(function(response) {
 		$('#extract').text(response);

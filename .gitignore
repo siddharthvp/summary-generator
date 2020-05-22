@@ -4,15 +4,12 @@ node_modules/
 npm-debug.log*
 
 # toolforge
-replica.my.cnf
 *.out
 *.err
 *.log
 logs/
 service.manifest
 core
-.bash*
-.profile
 .config/
 .kube/
 .toolskube/

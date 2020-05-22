@@ -4,14 +4,13 @@ const mwn = require('mwn');
 
 const app = express();
 app.use(express.json());
+app.use(express.static('static'));
 app.use(cors());
 
-// const port = parseInt(process.env.PORT, 10);
-const port = 443;
+const port = parseInt(process.env.PORT, 10);
 
 const bot = new mwn({ apiUrl: 'https://en.wikipedia.org/w/api.php' });
-
-const TextExtractor = require('../../TextExtractor')(bot);
+const TextExtractor = require('./TextExtractor')(bot);
 
 var handleRequest = (req, res) => {
 	var params = Object.assign({}, req.query, req.body);
@@ -26,6 +25,10 @@ var handleRequest = (req, res) => {
 };
 
 bot.getSiteInfo().then(() => {
+
+	app.get('/', (req, res) => {
+		res.sendFile(__dirname + '/index.html');
+	});
 
 	app.get('/index.html', (req, res) => {
 		res.sendFile(__dirname + '/index.html');
