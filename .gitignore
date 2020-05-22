@@ -13,5 +13,6 @@ service.manifest
 core
 .bash*
 .profile
+.config/
 .kube/
 .toolskube/
