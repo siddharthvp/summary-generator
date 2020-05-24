@@ -41,7 +41,7 @@ module.exports = function(bot) {
 			if (charLimit) {
 				// We consider a period followed by a space or newline NOT followed by a lowercase char
 				// as a sentence ending. Lowercase chars after period+space is generally use of an abbreviation
-				// XXX: this still results in issues with name like Arthur A. Kempod.
+				// XXX: this still results in issues with names like Arthur A. Kempod.
 				//  (?![^[]*?\]\]) so that this is not a period within a link
 				//  (?![^{*]?\}\}) so that this is not a period within a template - doesn't work if there
 				//      is a nested templates after the period.

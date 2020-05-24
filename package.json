@@ -1,26 +1,26 @@
 {
-    "name": "summary-generator",
-    "version": "1.0.0",
-    "description": "Generate summary of Wikipedia articles",
-    "main": "summary-generator.js",
-    "scripts": {
-      "test": "echo \"Error: no test specified\" && exit 1",
-      "start": "node server.js",
-      "deploy": "webservice --backend kubernetes node10 restart"
-    },
-    "repository": {
-      "type": "git",
-      "url": "git+https://github.com/siddharthvp/summary-generator.git"
-    },
-    "author": "Siddharth VP",
-    "license": "MIT",
-    "bugs": {
-      "url": "https://github.com/siddharthvp/summary-generator/issues"
-    },
-    "homepage": "https://github.com/siddharthvp/summary-generator#readme",
-    "dependencies": {
-      "cors": "^2.8.5",
-      "express": "^4.17.1",
-      "mwn": "^0.4.0"
-    }
+  "name": "summary-generator",
+  "version": "1.0.0",
+  "description": "Generate summary of Wikipedia articles",
+  "main": "server.js",
+  "scripts": {
+    "test": "export PORT=3000 && node server.js",
+    "start": "node server.js",
+    "deploy": "webservice --backend kubernetes node10 restart"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/siddharthvp/summary-generator.git"
+  },
+  "author": "Siddharth VP",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/siddharthvp/summary-generator/issues"
+  },
+  "homepage": "https://github.com/siddharthvp/summary-generator#readme",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.17.1",
+    "mwn": "^0.4.0"
   }
+}

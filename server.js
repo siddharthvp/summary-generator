@@ -27,11 +27,7 @@ var handleRequest = (req, res) => {
 bot.getSiteInfo().then(() => {
 
 	app.get('/', (req, res) => {
-		res.sendFile(__dirname + '/index.html');
-	});
-
-	app.get('/index.html', (req, res) => {
-		res.sendFile(__dirname + '/index.html');
+		res.sendFile(__dirname + '/static/index.html');
 	});
 
 	app.get('/summary', (req, res) => {

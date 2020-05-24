@@ -1,11 +1,12 @@
 /* globals $ */
-console.log('howdy');
+console.log('Wikipedia Summary Generator by SD0001');
+
 $('#submit').click(function(e) {
 	e.preventDefault();
 	var article_name = $('#article').val();
 	$('#loading').show();
 
-	$.get('https://summary-generator.toolforge.org/summary', {
+	$.get('/summary', {
 			article: article_name,
 			charLimit: 250,
 			hardUpperLimit: 500
@@ -18,7 +19,7 @@ $('#submit').click(function(e) {
 			body_only: true
 		});
 	}).then(function(response) {
-		$('#parsedextract').html(response.replace(/<script>/i, ''));
+		$('#parsedextract').html(response.replace(/<script/i, ''));
 		$('#loading').hide();
 	}).catch(function() {
 		$('#loading').text('Something went wrong :(');
