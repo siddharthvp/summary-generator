@@ -30,6 +30,8 @@ module.exports = function(bot) {
 				.replace(/^\s*[{|}=*#:<!].*$/mg, '')
 				// these are just bad
 				.replace(/__[A-Z]+__/g, '')
+				// horizontal rules on AFC drafts
+				.replace(/^----/m, '')
 				// trim left to prepare for next step
 				.trimLeft()
 				// keep only the first paragraph
