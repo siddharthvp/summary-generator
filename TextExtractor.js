@@ -1,20 +1,32 @@
+/**
+ * @param {mwn} bot 
+ */
 module.exports = function(bot) {
 
 	class TextExtractor {
 
 		/**
-		 * Get extract
+		 * Get wikitext extract. If you want plain text or HTML extracts, consider using 
+		 * the TextExtracts API instead.
 		 * @param {string} pagetext - full page text
 		 * @param {number} [charLimit] - cut off the extract at this many readable characters, or wherever
 		 * the sentence ends after this limit
 		 * @param {number} [hardUpperLimit] - cut off the extract at this many readable characters even if
 		 * the sentence hasn't ended
+		 * @param {Function} [preprocessHook] - optional function to work on the text at the 
+		 * beginnning
 		 */
-		static getExtract(pagetext, charLimit, hardUpperLimit) {
+		static getExtract(pagetext, charLimit, hardUpperLimit, preprocessHook) {
+
+			let extract = pagetext;
+
+			if (preprocessHook) {
+				extract = preprocessHook(extract);
+			}
 
 			// Remove images. Can't be done correctly with just regex as there could be wikilinks
 			// in the captions.
-			var extract = TextExtractor.removeImages(pagetext);
+			extract = TextExtractor.removeImages(pagetext);
 
 			// Remove templates beginning on a new line, such as infoboxes.
 			// These ocassionally contain parameters with part of the content
@@ -22,20 +34,20 @@ module.exports = function(bot) {
 			// thus can't be handled with the line regex.
 			extract = TextExtractor.removeTemplatesOnNewlines(extract);
 
+			// Remove some other templates too
+			extract = TextExtractor.removeTemplates(extract, ['efn', 'refn']);
+
 			extract = extract
 				.replace(/<!--.*?-->/sg, '')
 				// remove refs, including named ref definitions and named ref invocations
 				.replace(/<ref.*?(?:\/>|<\/ref>)/sgi, '')
 				// the magic
-				.replace(/^\s*[{|}=*#:<!].*$/mg, '')
-				// these are just bad
-				.replace(/__[A-Z]+__/g, '')
-				// horizontal rules on AFC drafts
-				.replace(/^----/m, '')
+				.replace(/^\s*[-{|}=*#:<!].*$/mg, '')
 				// trim left to prepare for next step
 				.trimLeft()
 				// keep only the first paragraph
 				.replace(/\n\n.*/s, '')
+				// unbold
 				.replace(/'''(.*?)'''/g, '$1')
 				.replace(/\(\{\{[Ll]ang-.*?\}\}\)/, '')
 				.trim();
@@ -43,7 +55,7 @@ module.exports = function(bot) {
 			if (charLimit) {
 				// We consider a period followed by a space or newline NOT followed by a lowercase char
 				// as a sentence ending. Lowercase chars after period+space is generally use of an abbreviation
-				// XXX: this still results in issues with names like Arthur A. Kempod.
+				// XXX: this still results in issues with name like Arthur A. Kempod.
 				//  (?![^[]*?\]\]) so that this is not a period within a link
 				//  (?![^{*]?\}\}) so that this is not a period within a template - doesn't work if there
 				//      is a nested templates after the period.
@@ -95,6 +107,24 @@ module.exports = function(bot) {
 			return text;
 		}
 
+		static removeTemplates(text, templates) {
+			var wkt = new bot.wikitext(text);
+			const makeRegexFromTemplate = function(template) {
+				return new RegExp('[' + template[0].toLowerCase() + template[0].toUpperCase() + ']' + template.slice(1), 'g');
+			}
+			wkt.parseTemplates({
+				namePredicate: name => {
+					return !templates.some(template => {
+						return makeRegexFromTemplate(template).test(name);
+					});
+				}
+			});
+			for (let template of wkt.templates) {
+				wkt.removeEntity(template);
+			}
+			return wkt.getText();
+		}
+
 		static effCharCount(text) {
 			return text
 				.replace(/\[\[:?(?:[^|\]]+?\|)?([^\]|]+?)\]\]/g, '$1')
@@ -105,14 +135,25 @@ module.exports = function(bot) {
 
 		/**
 		 * Do away with some of the more bizarre stuff from page extracts that aren't worth
-		 * checking for on a per-page basis @param {string} content
+		 * checking for on a per-page basis 
+		 * Minimise the amount of removals done here, since if the extract was cut off, it may
+		 * happen one of the regexes below will match across two different extracts.
+		 * @param {string} content
 		 */
 		static finalSanitise(content) {
 			return content.replace(/\[\[Category:.*?\]\]/gi, '')
+				// these are just bad
+				.replace(/__[A-Z]+__/g, '')
 				// Harvard referencing
 				.replace(/\{\{[sS]fnp?\|.*?\}\}/g, '')
 				// shortcut for named ref invocation
-				.replace(/\{\{r\|.*?\}\}/gi, '');
+				.replace(/\{\{r\|.*?\}\}/gi, '')
+				// inline parenthetical referencing
+				.replace(/\{\{[hH]arv\|.*?\}\}/g, '')
+				// pronunciation
+				.replace(/\{\{IPA.*?\}\}/g, '')
+				// audio
+				.replace(/\{\{[aA]udio\|.*?\}\}/g, '');
 		}
 	}
 
